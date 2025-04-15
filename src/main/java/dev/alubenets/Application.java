@@ -76,9 +76,10 @@ public class Application {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 4)
-    CommandLineRunner findTestOrderWithWrongTotalPrice(
+    CommandLineRunner findTestOrderWithRecalculatedPrice(
         OrderManagementService service
     ) {
         return args -> service.findOrderById(1L);
     }
+
 }

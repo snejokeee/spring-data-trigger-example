@@ -70,4 +70,27 @@ public class OrderManagementService {
         log.info("Order Details: {}", orderDetails);
     }
 
+    public void recalculateTotalPrice(Long orderId) {
+        var order = ordersRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        var details = orderDetailsRepository.findALlByOrderId(orderId);
+
+        var orderItems = details.stream()
+            .collect(Collectors.toMap(OrderDetailsEntity::getArticle, OrderDetailsEntity::getQuantity));
+
+        var products = productsRepository.findAllByArticleIn(orderItems.keySet());
+
+        var totalOrderPrice = products.stream()
+            .map(p -> {
+                var price = p.getPrice();
+                return orderItems.get(p.getArticle()) * price;
+            })
+            .reduce(Double::sum)
+            .orElse(0.0);
+
+        order.setTotalPrice(totalOrderPrice);
+
+        ordersRepository.save(order);
+    }
 }

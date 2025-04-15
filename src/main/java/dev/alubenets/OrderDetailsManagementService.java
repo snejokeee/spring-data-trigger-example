@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderDetailsManagementService {
 
+    private final OrderManagementService orderManagementService;
     private final OrderDetailsRepository orderDetailsRepository;
 
-    public OrderDetailsManagementService(OrderDetailsRepository orderDetailsRepository) {
+    public OrderDetailsManagementService(OrderManagementService orderManagementService, OrderDetailsRepository orderDetailsRepository) {
+        this.orderManagementService = orderManagementService;
         this.orderDetailsRepository = orderDetailsRepository;
     }
 
@@ -20,11 +22,13 @@ public class OrderDetailsManagementService {
                 .setArticle(article)
                 .setQuantity(quantity)
         );
+        orderManagementService.recalculateTotalPrice(orderId);
     }
 
     public void deleteDetails(Long orderId, String article) {
         orderDetailsRepository.findByOrderIdAndArticle(orderId, article)
             .ifPresent(orderDetailsRepository::delete);
+        orderManagementService.recalculateTotalPrice(orderId);
     }
 
     public void changeDetails(Long orderId, String article, Long quantity) {
@@ -32,5 +36,6 @@ public class OrderDetailsManagementService {
             .orElseThrow(() -> new RuntimeException("Order details not found"));
         details.setQuantity(quantity);
         orderDetailsRepository.save(details);
+        orderManagementService.recalculateTotalPrice(orderId);
     }
 }
