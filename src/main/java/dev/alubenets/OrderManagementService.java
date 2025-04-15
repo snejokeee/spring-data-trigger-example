@@ -66,7 +66,8 @@ public class OrderManagementService {
         var orderDetails = items.stream()
             .collect(Collectors.toMap(OrderDetailsEntity::getArticle, OrderDetailsEntity::getQuantity));
 
-        log.info("Found order with id: " + orderId + " for total price: {}", order.getTotalPrice());
-        log.info("Order Details: " + orderDetails);
+        log.info("Found order with id: {} for total price: {}", order.getOrderId(), order.getTotalPrice());
+        log.info("Order Details: {}", orderDetails);
     }
+
 }
